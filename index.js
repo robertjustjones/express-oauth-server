@@ -43,12 +43,15 @@ ExpressOAuthServer.prototype.authenticate = function(options) {
       .then(function() {
         return server.authenticate(request, response, options);
       })
-      .tap(function(token) {
+      .then(function(token) {
         res.locals.oauth = { token: token };
         next();
       })
       .catch(function(e) {
-        return handleError(e, req, res);
+        handleError(e, req, res, response);
+        if( !res.headersSent ) {
+          next(e);
+        }
       });
       //.finally(next);
   };
